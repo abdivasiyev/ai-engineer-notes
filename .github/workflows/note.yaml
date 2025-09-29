@@ -40,7 +40,7 @@ jobs:
               \"contents\": [
                 {
                   \"parts\": [
-                    {\"text\": \"You are writing an AI Engineer Note for $TODAY. ${{ steps.prompt.outputs.prompt }} Keep it under 4 sentences and without any personal information. Format should be in Telegram Markdown format!\"}
+                    {\"text\": \"You are writing an AI Engineer Note for $TODAY. ${{ steps.prompt.outputs.prompt }} Keep it under 4 sentences and without any personal information.\"}
                   ]
                 }
               ]
@@ -56,10 +56,8 @@ jobs:
 
       - name: Send to Telegram
         run: |
-          ESCAPED_NOTE=$(printf '%s' "${{ steps.generate.outputs.note }}" | sed -E 's/([_*\[\]\(\)~`>#+\-=|{}.!])/\\\1/g')
-
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="📝 AI Engineer Note – $(date +'%A, %B %d'):\n\n$ESCAPED_NOTE" \
+            -d text="📝 AI Engineer Note – $(date +'%A, %B %d'):\n\n${{ steps.generate.outputs.note }}" \
             -d parse_mode=MarkdownV2 \
             -d disable_web_page_preview=true
