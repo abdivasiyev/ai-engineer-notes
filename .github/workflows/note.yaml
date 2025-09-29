@@ -1,0 +1,51 @@
+name: Daily AI Engineer Note
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # every day at 9:00 UTC
+  workflow_dispatch: # allows manual trigger
+
+jobs:
+  post-note:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Choose Prompt by Weekday
+        id: prompt
+        run: |
+          DOW=$(date +%u)
+          case $DOW in
+            1) PROMPT="Imagine you’re mentoring a junior developer. Share one concise, practical piece of software engineering advice that is timeless and easy to apply." ;;
+            2) PROMPT="Write a short note about distributed systems or scalability that highlights a simple but powerful lesson for engineers." ;;
+            3) PROMPT="Share a productivity or clean code tip that can help engineers write better code every day." ;;
+            4) PROMPT="Write a concise reflection on DevOps, infrastructure, or automation that would inspire engineers to build resilient systems." ;;
+            5) PROMPT="Write a short AI/ML engineering insight — practical and inspiring, focused on real-world software applications." ;;
+            6) PROMPT="Share a short security or CTF-inspired lesson that highlights a common pitfall and how to avoid it." ;;
+            7) PROMPT="Write an encouraging note about the mindset of continuous learning and craftsmanship in software engineering." ;;
+          esac
+          echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
+
+      - name: Generate note with OpenAI
+        id: generate
+        run: |
+          TODAY=$(date +'%B %d, %Y')
+
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
+            -d "{
+              \"model\": \"gpt-5\",
+              \"messages\": [
+                {\"role\": \"user\", \"content\": \"You are writing an AI Engineer Note for $TODAY. ${{ steps.prompt.outputs.prompt }} Keep it under 4 sentences.\"}
+              ],
+              \"max_tokens\": 200
+            }")
+
+          NOTE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+          echo "note=$NOTE" >> $GITHUB_OUTPUT
+
+      - name: Send to Telegram
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="📝 AI Engineer Note – $(date +'%A, %B %d'):\n\n${{ steps.generate.outputs.note }}" \
+            -d disable_web_page_preview=true
