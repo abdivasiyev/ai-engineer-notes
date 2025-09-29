@@ -22,7 +22,12 @@ jobs:
             6) PROMPT="Share a short security or CTF-inspired lesson that highlights a common pitfall and how to avoid it." ;;
             7) PROMPT="Write an encouraging note about the mindset of continuous learning and craftsmanship in software engineering." ;;
           esac
-          echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
+
+          {
+            echo "prompt<<EOF"
+            echo "$PROMPT"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
       - name: Generate note with Gemini
         id: generate
