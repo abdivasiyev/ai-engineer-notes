@@ -1,9 +1,9 @@
-name: Daily AI Engineer Note
+name: Daily AI Engineer Note (Gemini with Rotation)
 
 on:
   schedule:
     - cron: "0 9 * * *" # every day at 9:00 UTC
-  workflow_dispatch: # allows manual trigger
+  workflow_dispatch:
 
 jobs:
   post-note:
@@ -24,23 +24,24 @@ jobs:
           esac
           echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
 
-      - name: Generate note with OpenAI
+      - name: Generate note with Gemini
         id: generate
         run: |
           TODAY=$(date +'%B %d, %Y')
 
-          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+          RESPONSE=$(curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${{ secrets.GEMINI_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
             -d "{
-              \"model\": \"gpt-5\",
-              \"messages\": [
-                {\"role\": \"user\", \"content\": \"You are writing an AI Engineer Note for $TODAY. ${{ steps.prompt.outputs.prompt }} Keep it under 4 sentences.\"}
-              ],
-              \"max_tokens\": 200
+              \"contents\": [
+                {
+                  \"parts\": [
+                    {\"text\": \"You are writing an AI Engineer Note for $TODAY. ${{ steps.prompt.outputs.prompt }} Keep it under 4 sentences.\"}
+                  ]
+                }
+              ]
             }")
 
-          NOTE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+          NOTE=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           echo "note=$NOTE" >> $GITHUB_OUTPUT
 
       - name: Send to Telegram
