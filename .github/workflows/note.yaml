@@ -47,7 +47,12 @@ jobs:
             }")
 
           NOTE=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-          echo "note=$NOTE" >> $GITHUB_OUTPUT
+
+          {
+            echo "note<<EOF"
+            echo "$NOTE"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
       - name: Send to Telegram
         run: |
