@@ -46,7 +46,7 @@ jobs:
               ]
             }")
 
-          NOTE=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+          NOTE=$(echo "$RESPONSE" | jq '.candidates[0].content.parts[0].text')
           echo $NOTE > note.txt
 
       - name: Send to Telegram
