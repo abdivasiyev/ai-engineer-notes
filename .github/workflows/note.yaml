@@ -40,7 +40,7 @@ jobs:
               \"contents\": [
                 {
                   \"parts\": [
-                    {\"text\": \"You are writing an AI Engineer Note for $TODAY in Uzbek.  The note should be written in a professional but approachable style, as if mentoring a group of engineers.  Make it detailed (10–15 sentences), thoughtful, and practical.  Include:- A clear theme (e.g., code quality, distributed systems, AI engineering, DevOps, software craftsmanship).  - A mix of theory and real-world advice.  - At least one analogy, metaphor, or storytelling element to make it memorable.  - A closing insight or encouragement.  Do not format as bullet points; write as flowing prose. Follow this context, and use emojis also: ${{ steps.prompt.outputs.prompt }}  \"}
+                    {\"text\": \"You are writing an AI Engineer Note for $TODAY in Uzbek.  The note should be written in a professional but approachable style, as if mentoring a group of engineers.  Make it detailed (10–15 sentences), thoughtful, and practical. Add paragraphs, code snippets.  Include:- A clear theme (e.g., code quality, distributed systems, AI engineering, DevOps, software craftsmanship).  - A mix of theory and real-world advice.  - At least one analogy, metaphor, or storytelling element to make it memorable.  - A closing insight or encouragement.  Do not format as bullet points; write as flowing prose. Follow this context, and use emojis also: ${{ steps.prompt.outputs.prompt }}  \"}
                   ]
                 }
               ]
